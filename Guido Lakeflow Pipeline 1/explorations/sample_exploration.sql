@@ -60,6 +60,8 @@ FROM guido.lakeflow.orders_with_users;
 -- MAGIC     'unique_users': df['user_id'].nunique()
 -- MAGIC }
 -- MAGIC
+-- MAGIC display(pd.DataFrame([stats]))
+-- MAGIC
 -- MAGIC # Plot histogram of order amounts
 -- MAGIC plt.figure(figsize=(10, 6))
 -- MAGIC plt.hist(df['amount'], bins=30, color='skyblue', edgecolor='black')
