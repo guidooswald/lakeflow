@@ -21,3 +21,60 @@ USE CATALOG `guido`;
 USE SCHEMA `lakeflow`;
 
 SELECT * from sample_trips_guido_lakeflow_pipeline_1;
+
+-- COMMAND ----------
+
+-- Basic statistics for orders_with_users table
+SELECT
+  COUNT(*) AS total_orders,
+  COUNT(DISTINCT user_id) AS unique_users,
+  MIN(amount) AS min_amount,
+  MAX(amount) AS max_amount,
+  AVG(amount) AS avg_amount,
+  SUM(amount) AS total_amount,
+  MIN(order_creation_date) AS first_order_date,
+  MAX(order_creation_date) AS last_order_date
+FROM guido.lakeflow.orders_with_users;
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC import matplotlib.pyplot as plt
+-- MAGIC import pandas as pd
+-- MAGIC
+-- MAGIC # Read data from the orders_with_users table
+-- MAGIC df = spark.sql("""
+-- MAGIC SELECT
+-- MAGIC   amount,
+-- MAGIC   order_creation_date,
+-- MAGIC   user_id
+-- MAGIC FROM guido.lakeflow.orders_with_users
+-- MAGIC """).toPandas()
+-- MAGIC
+-- MAGIC # Basic statistics
+-- MAGIC stats = {
+-- MAGIC     'min_amount': df['amount'].min(),
+-- MAGIC     'max_amount': df['amount'].max(),
+-- MAGIC     'avg_amount': df['amount'].mean(),
+-- MAGIC     'total_orders': len(df),
+-- MAGIC     'unique_users': df['user_id'].nunique()
+-- MAGIC }
+-- MAGIC
+-- MAGIC # Plot histogram of order amounts
+-- MAGIC plt.figure(figsize=(10, 6))
+-- MAGIC plt.hist(df['amount'], bins=30, color='skyblue', edgecolor='black')
+-- MAGIC plt.title('Order Amount Distribution')
+-- MAGIC plt.xlabel('Amount')
+-- MAGIC plt.ylabel('Frequency')
+-- MAGIC plt.grid(True)
+-- MAGIC plt.show()
+-- MAGIC
+-- MAGIC # Plot number of orders per day
+-- MAGIC orders_per_day = df.groupby('order_creation_date').size()
+-- MAGIC plt.figure(figsize=(12, 6))
+-- MAGIC orders_per_day.plot(kind='bar')
+-- MAGIC plt.title('Number of Orders per Day')
+-- MAGIC plt.xlabel('Order Creation Date')
+-- MAGIC plt.ylabel('Number of Orders')
+-- MAGIC plt.tight_layout()
+-- MAGIC plt.show()
